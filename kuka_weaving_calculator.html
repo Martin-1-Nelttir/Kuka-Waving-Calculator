@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KUKA Weaving Kalkulačka</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+  <style>
+    body {
+      padding: 1rem;
+      background-color: #f4f4f4;
+    }
+    .container {
+      margin-top: 2rem;
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .result {
+      background: #e3f2fd;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h5 class="center-align">KUKA Weaving Calculator</h5>
+
+    <div class="input-field">
+      <input id="freq" type="text" inputmode="decimal" oninput="sanitizeInput(this); calculate()">
+      <label for="freq">Frekvence weavingu (Hz)</label>
+      <span id="freq-warning" class="helper-text red-text" style="display:none;">
+        Frekvence je větší než 3 Hz – zkontroluj parametry!
+      </span>
+    </div>
+
+    <div class="input-field">
+      <input id="speed" type="text" inputmode="decimal" oninput="sanitizeInput(this); calculate()">
+      <label for="speed">Rychlost svařování (m/min)</label>
+    </div>
+
+    <div class="input-field">
+      <input id="amplitude" type="text" inputmode="decimal" oninput="sanitizeInput(this); calculate()">
+      <label for="amplitude">Amplituda weavingu (mm)</label>
+    </div>
+
+    <div class="result">
+      <p><strong>Length (délka 1 kmitu):</strong> <span id="length">-</span> mm</p>
+      <p><strong>Deflection (amplituda):</strong> <span id="deflection">-</span> mm</p>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script>
+    function sanitizeInput(input) {
+      input.value = input.value.replace(",", ".");
+    }
+
+    function calculate() {
+      const fInput = document.getElementById('freq');
+      const vInput = document.getElementById('speed');
+      const AInput = document.getElementById('amplitude');
+      const warning = document.getElementById('freq-warning');
+
+      const f = parseFloat(fInput.value.replace(",", "."));
+      const v = parseFloat(vInput.value.replace(",", "."));
+      const A = parseFloat(AInput.value.replace(",", "."));
+
+      // Ukážeme varování, ale výpočet stejně proběhne
+      if (f > 3) {
+        fInput.classList.add('invalid');
+        warning.style.display = 'block';
+      } else {
+        fInput.classList.remove('invalid');
+        warning.style.display = 'none';
+      }
+
+      if (!isNaN(f) && !isNaN(v) && !isNaN(A)) {
+        const v_mm_s = v * 1000 / 60;
+        const length = v_mm_s / f;
+
+        document.getElementById('length').textContent = length.toFixed(2);
+        document.getElementById('deflection').textContent = A.toFixed(2);
+      } else {
+        document.getElementById('length').textContent = "-";
+        document.getElementById('deflection').textContent = "-";
+      }
+    }
+  </script>
+
+</body>
+</html>
